@@ -9,13 +9,8 @@ let game = {
         height: 100,
         spawnMargin: game.playerData.radius // The closest players can spawn to the edge of the map
     },
-    players: []
+    players: {}
 };
-
-const __player = {
-    charging: false,
-    dead: false
-}
 
 /*
  * The game logic that runs once per game tick.
@@ -27,8 +22,9 @@ const __player = {
  */
 let gameLoop = () => {
     // Loop through each player
-    for (let i = 0; i < game.players.length; i++) {
-        let player = game.players[i];
+    let players = Object.entries(game.players);
+    for (let i = 0; i < players.length; i++) {
+        let player = players[i];
 
         // Move player
         if (player.charging) movePlayerCharge(player);
@@ -59,12 +55,15 @@ let handleObstacleCollision = (player) => {
  * then handles the collision by killing one of the players.
 */
 let handlePlayerCollision = (player, index) => {
+    // Get list of players
+    let players = Object.entries(game.players);
+
     // Filter list of players to those colliding with the player
     let colliding = [];
     // Only search players in the list after the current player
     // since previous players were already checked
-    for (let i = index + 1; i < game.players.length; i++) {
-        let otherPlayer = game.players[i];
+    for (let i = index + 1; i < players.length; i++) {
+        let otherPlayer = players[i];
         if (otherPlayer.dead) continue;
         
         // Find distance between the centers of the players
@@ -131,19 +130,16 @@ let movePlayerStraight = (player) => {
 /*
  * Adds a player to the player list.
  * 
- * name: the player name
- * picture: the URL to the player's profile picture
+ * user: the player object taken from the Roblox API.
 */
-let addPlayer = (name, picture) => {
-    let newPlayer = Object.create(__player);
-
-    // Set new player info
-    newPlayer.name = name;
-    newPlayer.picture = picture;
+let addPlayer = (user) => {
+    // Add player flags
+    user.charging = false;
+    user.dead = false;
 
     // Set new player position
     let spawnPadding = game.playerData.radius + game.map.spawnMargin;
-    newPlayer.position = {
+    user.position = {
         x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
         y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
     };
@@ -151,17 +147,18 @@ let addPlayer = (name, picture) => {
     // Set new player velocity
     let velNormX = Math.random();
     let velNormY = Math.sqrt(1 - velNormX*velNormX);
-    newPlayer.velocity = {
+    user.velocity = {
         x: velNormX * Math.sqrt(game.playerData.startingSpeed),
         y: velNormY * Math.sqrt(game.playerData.startingSpeed)
     };
 
-    game.players.push();
+    // Add new player to player list
+    game.players[user.id] = user;
 }
 
 /*
  * Removes a player from the player list.
 */
 let removePlayer = (player) => {
-    game.players = game.players.filter(currentPlayer => currentPlayer !== player);
+    delete game.players[player.id];
 }
