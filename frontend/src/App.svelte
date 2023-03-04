@@ -5,7 +5,7 @@
 </script>
 
 <main>
-    {#if $user}
+    {#if !$user}
         <Login/>
     {:else}
         <Game/>
