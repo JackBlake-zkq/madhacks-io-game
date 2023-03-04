@@ -9,8 +9,7 @@ let game = {
         height: 100,
         spawnMargin: game.playerData.radius // The closest players can spawn to the edge of the map
     },
-    players: [],
-    obstacles: []
+    players: []
 };
 
 const __player = {
@@ -20,6 +19,11 @@ const __player = {
 
 /*
  * The game logic that runs once per game tick.
+ * Moves each player, then checks if any players are
+ * colliding with any objects or other players before
+ * handling any collisions accordingly.
+ * 
+ * Returns the current game state.
  */
 let gameLoop = () => {
     // Loop through each player
@@ -35,12 +39,11 @@ let gameLoop = () => {
         handlePlayerCollision(player, i);
     }
 
-    // Emit gameTick event with current game state
-    // TODO
+    return game;
 }
 
 /*
- * Checks if the player is colliding with any obstacle,
+ * Checks if the player is colliding with any obstacles,
  * then handles the collision accordingly.
  */
 let handleObstacleCollision = (player) => {
@@ -81,9 +84,9 @@ let handlePlayerCollision = (player, index) => {
  * Handles which player dies in a player collision.
  */
 let duel = (player, otherPlayers) => {
-    for(otherPlayer of otherPlayers) {
-        playerVel = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
-        otherVel = Math.sqrt(Math.pow(otherPlayer.velocity.x, 2) + Math.pow(otherPlayer.velocity.y, 2));
+    for(let otherPlayer of otherPlayers) {
+        let playerVel = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
+        let otherVel = Math.sqrt(Math.pow(otherPlayer.velocity.x, 2) + Math.pow(otherPlayer.velocity.y, 2));
 
         // If neither charging, faster speed wins
         if (!player.charging && !otherPlayer.charging) {
@@ -106,6 +109,9 @@ let duel = (player, otherPlayers) => {
     }
 }
 
+/*
+ * Sets a player's dead flag to true.
+ */
 let kill = (player) => {
     player.dead = true;
 }
@@ -114,6 +120,9 @@ let movePlayerCharge = (player) => {
     // TODO
 }
 
+/*
+ * Moves the player in a straight line based on its velocity.
+ */
 let movePlayerStraight = (player) => {
     player.location.x += player.velocity.x;
     player.location.y += player.velocity.y;
