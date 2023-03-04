@@ -1,5 +1,8 @@
 import svelte from 'rollup-plugin-svelte';
 import resolve from '@rollup/plugin-node-resolve';
+import css from 'rollup-plugin-css-only';
+
+const production = !process.env.ROLLUP_WATCH;
 
 export default {
   input: 'src/main.js',
@@ -11,7 +14,11 @@ export default {
   plugins: [
     svelte({
       include: 'src/**/*.svelte',
+      compilerOptions: {
+				dev: !production
+			}
     }),
     resolve({ browser: true }),
+    css({ output: 'bundle.css' })
   ],
 };

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"nodemon index.j\" \"npm --prefix frontend run watch\"",
+    "dev": "concurrently \"nodemon index.js\" \"npm --prefix frontend run watch\"",
     "start": "node index.js"
   },
   "repository": {
