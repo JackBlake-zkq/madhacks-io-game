@@ -15,6 +15,10 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "concurrently": "^7.6.0",
     "rollup": "^3.18.0",
+    "rollup-plugin-css-only": "^4.3.0",
     "rollup-plugin-svelte": "^7.1.4"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.6.1"
   }
 }
