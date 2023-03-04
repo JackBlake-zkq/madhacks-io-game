@@ -2,11 +2,12 @@
 let game = {
     playerData: {
         radius: 5,
-        startingSpeed: 5
+        startingSpeed: 5,
+        chargeRadius: 20
     },
     map: {
-        width: 100,
-        height: 100,
+        width: 500,
+        height: 500,
         spawnMargin: game.playerData.radius // The closest players can spawn to the edge of the map
     },
     players: {}
@@ -115,8 +116,23 @@ let kill = (player) => {
     player.dead = true;
 }
 
+/*
+ * Moves the player in a circular motion centered on a point
+ * perpendicular to the previous direction of motion
+ */
 let movePlayerCharge = (player) => {
-    // TODO
+    // Move player along circular path by an amount defined by speed
+    // Convert speed to arc length, find point at that arc length
+    let radians = speed / game.playerData.chargeRadius;
+    let cX = player.charging.x;
+    let cY = player.charging.y;
+    let pX = player.position.x;
+    let pY = player.position.y;
+    let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
+    let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
+    
+    // Set player position to new position
+    player.position = { x: newX, y: newY };
 }
 
 /*
@@ -134,7 +150,7 @@ let movePlayerStraight = (player) => {
 */
 let addPlayer = (user) => {
     // Add player flags
-    user.charging = false;
+    user.charging = null; // Will contain center point of charging circle if currently charging
     user.dead = false;
 
     // Set new player position
@@ -159,6 +175,26 @@ let addPlayer = (user) => {
 /*
  * Removes a player from the player list.
 */
-let removePlayer = (player) => {
-    delete game.players[player.id];
+let removePlayer = (playerId) => {
+    delete game.players[playerId];
+}
+
+/*
+ * Sets a player's charging value to the center point that
+ * it will be spinning around while charging.
+ */
+let startPlayerCharging = (playerId) => {
+    let player = game.players[playerId];
+    let speed = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
+    player.charging = {
+        x: player.velocity.y / speed * game.playerData.chargeRadius,
+        y: -player.velocity.x / speed * game.playerData.chargeRadius
+    }
+}
+
+/*
+ * Stops player from charging by setting its charging value to null.
+ */
+let stopPlayerCharging = (playerId) => {
+    game.players[playerId].charging = null;
 }
