@@ -10,4 +10,4 @@ setInterval(() => {
         togglePlayerCharging(state.players[0].id);
     }
     console.log(state.players);
-}, 50);
+}, 100);
