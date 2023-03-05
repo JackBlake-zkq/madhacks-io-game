@@ -1,7 +1,8 @@
 // Stores the entirety of the game's state.
 let game = {
     playerData: {
-        radius: 20,
+        radius: 30,
+        speedCap: 29.99, // Must be <radius so players can't clip through one another
         startingSpeed: 5,
         chargeRadius: 100,
         chargeSpeed: 0.01,
@@ -10,7 +11,7 @@ let game = {
     map: {
         width: 1000,
         height: 1000,
-        spawnMargin: 20 // The closest players can spawn to the edge of the map
+        spawnMargin: 30 // The closest players can spawn to the edge of the map
     },
     players: {}
 };
@@ -166,10 +167,20 @@ let movePlayerCharge = (player) => {
  * the global charge speed.
  */
 let increaseSpeed = (player, increase) => {
+    // Add increase to score
+    player.score += increase;
+
+    // Calculate current speed
     let vX = player.velocity.x;
     let vY = player.velocity.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
-    let newSpeed = speed + increase;
+
+    // Multiply increase based on current speed
+    let capDiff = game.playerData.speedCap - speed;
+    let multiplier = capDiff / speedCap;
+
+    // Calculate new speed
+    let newSpeed = speed + (increase*speedCap);
     vX = vX / Math.sqrt(speed) * Math.sqrt(newSpeed);
     vY = vY / Math.sqrt(speed) * Math.sqrt(newSpeed);
     player.velocity = { x: vX, y: vY };
@@ -192,6 +203,7 @@ let addPlayer = (user) => {
     // Add player flags
     user.charging = null; // Will contain center point of charging circle if currently charging
     user.dead = false;
+    user.score = game.playerData.startingSpeed;
 
     // Set new player location
     let spawnPadding = game.playerData.radius + game.map.spawnMargin;
@@ -236,12 +248,6 @@ let startPlayerCharging = (player) => {
  */
 let stopPlayerCharging = (player) => {
     player.charging = null;
-}
-
-let togglePlayerCharging = (playerId) => {
-    let player = game.players[playerId];
-    if (player.charging) stopPlayerCharging(player);
-    else startPlayerCharging(player);
 }
 
 module.exports = { gameLoop, addPlayer, removePlayer, startPlayerCharging, stopPlayerCharging };
