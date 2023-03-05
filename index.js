@@ -16,9 +16,12 @@ const io = new Server(server);
 io.on("connection", socket => {
     let user;
     socket.on("login", async input => {
-        console.log(input.username)
-        response = await axios.get
+        let userData;
+        await axios.get
             ("https://users.roblox.com/v1/users/search?keyword=" + input.username + "&limit=10")
+            .then(res => {
+                userData = res.data.data[0];
+            })
             .catch(res => {
                 switch(res.status){
                     case 429:
@@ -31,21 +34,19 @@ io.on("connection", socket => {
                         socket.emit("loginFail", "Unknown error occured");
                         break;  
                 }
-                return;
             })
-            let userData = response.data.data[0];
-            console.log(userData)
-            res = await axios.get
+            if(!userData) return;
+            await axios.get
                 ("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" + 
                     userData['id'] + "&size=48x48&format=Png&isCircular=true")
                     .then(res => {
                         userData.pfp = res.data.data[0]['imageUrl'];
                     })
                     .catch(res => {
-                        console.log(res.status);
                         userData.pfp = "https://i.imgur.com/2RnSO8r.png";
                     }) 
             user = userData;
+            console.log(user);
             socket.emit("loginSuccessful", user);
     });
     

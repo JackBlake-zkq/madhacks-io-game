@@ -2,7 +2,8 @@ import socket from "./socket";
 import { readable, writable } from 'svelte/store';
 
 export const user = writable(null, set => {
-    socket.on("loginSuccesful", (user) => {
+    socket.on("loginSuccessful", user => {
+        console.log(user);
         set(user);
     });
 });
