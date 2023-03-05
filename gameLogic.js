@@ -2,9 +2,9 @@
 let game = {
     playerData: {
         radius: 5,
-        startingSpeed: 1,
-        chargeRadius: 200,
-        chargeSpeed: 0.001
+        startingSpeed: 5,
+        chargeRadius: 100,
+        chargeSpeed: 0
     },
     map: {
         width: 1000,
@@ -33,7 +33,7 @@ let gameLoop = () => {
         if (player.charging) {
             movePlayerCharge(player);
             // Increase player speed
-            increaseSpeed(player);
+            //increaseSpeed(player); // TODO
         }
         else movePlayerStraight(player);
 
@@ -50,11 +50,29 @@ let gameLoop = () => {
  * then handles the collision accordingly.
  */
 let handleObstacleCollision = (player) => {
-    // Handle wall collision
-    let verticalWall = (player.location.y - game.playerData.radius <= 0) || (player.location.y + game.playerData.radius >= game.map.height);
-    let horizontalWall = (player.location.x - game.playerData.radius <= 0) || (player.location.x + game.playerData.radius >= game.map.width);
-    if (verticalWall) player.velocity.y *= -1;
-    if (horizontalWall) player.velocity.x *= -1;
+    // Top wall
+    if (player.location.y - game.playerData.radius <= 0) {
+        player.velocty.y *= -1;
+        player.location.y = game.playerData.radius + 1;
+    }
+
+    // Bottom wall
+    else if (player.location.y + game.playerData.radius >= game.map.height) {
+        player.velocity.y *= -1;
+        player.location.y = game.map.height - game.playerData.radius - 1;
+    }
+
+    // Left wall
+    if (player.location.x - game.playerData.radius <= 0) {
+        player.velocity.x *= -1;
+        player.location.x = game.playerData.radius + 1;
+    }
+
+    // Right wall
+    else if (player.location.x + game.playerData.radius >= game.map.width) {
+        player.velocity.x *= -1;
+        player.location.x = game.map.width - game.playerData.radius - 1;
+    }
 }
 
 /*
@@ -216,8 +234,8 @@ let removePlayer = (playerId) => {
 let startPlayerCharging = (player) => {
     let speed = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
     player.charging = {
-        x: player.velocity.y / speed * game.playerData.chargeRadius,
-        y: -player.velocity.x / speed * game.playerData.chargeRadius
+        x: player.location.x + (player.velocity.y / speed * game.playerData.chargeRadius),
+        y: player.location.y + (-player.velocity.x / speed * game.playerData.chargeRadius)
     }
 }
 
