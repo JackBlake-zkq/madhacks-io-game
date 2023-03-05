@@ -1,7 +1,7 @@
 // Stores the entirety of the game's state.
 let game = {
     playerData: {
-        radius: 5,
+        radius: 20,
         startingSpeed: 5,
         chargeRadius: 100,
         chargeSpeed: 0
@@ -254,4 +254,4 @@ let togglePlayerCharging = (playerId) => {
     else startPlayerCharging(player);
 }
 
-module.exports = { gameLoop, addPlayer, removePlayer, togglePlayerCharging };
+module.exports = { gameLoop, addPlayer, removePlayer, startPlayerCharging, stopPlayerCharging };
