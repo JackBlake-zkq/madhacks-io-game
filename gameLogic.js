@@ -34,7 +34,7 @@ let gameLoop = () => {
         if (player.charging) {
             movePlayerCharge(player);
             // Increase player speed
-            increaseSpeed(player);
+            increaseSpeed(player, game.playerData.chargeSpeed);
         }
         movePlayerStraight(player);
 
@@ -115,20 +115,20 @@ let duel = (player, otherPlayers) => {
 
         // If neither charging, faster speed wins
         if (!player.charging && !otherPlayer.charging) {
-            if (playerVel >= otherVel) kill(otherPlayer);
-            else kill (player);
+            if (playerVel >= otherVel) kill(otherPlayer, player);
+            else kill (player, otherPlayer);
         }
         
         // If both are charging, faster speed wins
         else if (player.charging && otherPlayer.charging) {
-            if (playerVel >= otherVel) kill(otherPlayer);
-            else kill (player);
+            if (playerVel >= otherVel) kill(otherPlayer, player);
+            else kill (player, otherPlayer);
         }
 
         // If one is charging, non-charging wins
         else {
-            if (player.charging) kill(player);
-            else kill(otherPlayer);
+            if (player.charging) kill(player, otherPlayer);
+            else kill(otherPlayer, player);
         }
 
     }
@@ -137,7 +137,9 @@ let duel = (player, otherPlayers) => {
 /*
  * Sets a player's dead flag to true.
  */
-let kill = (player) => {
+let kill = (player, killer) => {
+    let playerSpeed = Math.sqrt(player.velocity.x*player.velocity.x + player.velocity.y*player.velocity.y);
+    increaseSpeed(killer, playerSpeed);
     player.dead = true;
 }
 
@@ -149,21 +151,8 @@ let movePlayerCharge = (player) => {
     // Set up variables
     let vX = player.velocity.x;
     let vY = player.velocity.y;
-    let cX = player.charging.x;
-    let cY = player.charging.y;
-    let pX = player.location.x;
-    let pY = player.location.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
     let radians = speed / game.playerData.chargeRadius;
-
-    /*
-    // Convert speed to arc length, find point at that arc length
-    let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
-    let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
-    
-    // Set player location to new location
-    player.location = { x: newX, y: newY };
-    */
 
     // Change player velocity by arc angle
     player.velocity = {
@@ -176,11 +165,11 @@ let movePlayerCharge = (player) => {
  * Increases the speed of a player by
  * the global charge speed.
  */
-let increaseSpeed = (player) => {
+let increaseSpeed = (player, increase) => {
     let vX = player.velocity.x;
     let vY = player.velocity.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
-    let newSpeed = speed + game.playerData.chargeSpeed;
+    let newSpeed = speed + increase;
     vX = vX / Math.sqrt(speed) * Math.sqrt(newSpeed);
     vY = vY / Math.sqrt(speed) * Math.sqrt(newSpeed);
     player.velocity = { x: vX, y: vY };
