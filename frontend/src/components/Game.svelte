@@ -46,7 +46,6 @@
     main {
         width: 50vw;
         height: 100vh;
-        display: inline-block;
         position: relative;
     }
     svg {

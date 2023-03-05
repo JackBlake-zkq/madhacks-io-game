@@ -21,13 +21,12 @@
 
 <style>
     main {
-        display: inline-block;
-        width: 24vw;
+        width: 20vw;
         position: relative;
         height: 100vh;
     }
     div {
-        width: 24vw;
+        width: 20vw;
         height: 50vw;
         padding: 2rem;
         position: absolute;

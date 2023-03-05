@@ -12,10 +12,8 @@
 
 <style>
     main {
-        display: inline-block;
-        width: 24vw;
+        width: 20vw;
         height: 100vh;
-        overflow: scroll;
         position: relative;
     }
     h3 {

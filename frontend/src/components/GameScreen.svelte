@@ -12,3 +12,10 @@
     <Leaderboard/>
     <DeathOverlay/>
 </main>
+
+<style>
+    main {
+        display: flex;
+        justify-content: center;
+    }
+</style>
