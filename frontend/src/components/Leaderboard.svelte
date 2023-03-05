@@ -9,7 +9,7 @@
         <table>
             <tr><th>Player</th><th>Score</th></tr>
             {#each leaderboard as player}
-                {#if !player.dead}
+                {#if !player.dead && !player.isBot}
                     <tr class={player.id == $user.id ? 'highlighted' : ''}>
                         <th>{player.name}</th><th>{Math.round(player.score * 10) / 10}</th>
                     </tr>
