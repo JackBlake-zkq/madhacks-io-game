@@ -14,11 +14,10 @@
             {$loginError}
         </div>
     {/if}
-    <h1 >(Name)</h1>
+    <h1>ROBUG</h1>
     <p class = "center">If you want to use your roblox avatar enter your roblox username!</p>
         <div class = "center" >
             <input bind:value={username} placeholder="username" type = "username">
-            <!--<input bind:value={pass} placeholder="password"> -->
             <button on:click={login}>Login</button>
         </div>
 </main>
@@ -44,7 +43,8 @@
     h1 {
         text-align: center;
         margin-top: 7rem;
-        font-size: 50px;
+        font-size: 10rem;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     }
     button{
         margin:0 auto;
