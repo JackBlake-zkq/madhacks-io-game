@@ -233,6 +233,7 @@ let addPlayer = (user) => {
 */
 let removePlayer = (playerId) => {
     delete game.players[playerId];
+    return Object.keys(game.players).length;
 }
 
 /*
