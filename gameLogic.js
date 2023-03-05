@@ -1,10 +1,11 @@
 // Stores the entirety of the game's state.
 let game = {
     playerData: {
-        radius: 5,
-        startingSpeed: 1,
-        chargeRadius: 200,
-        chargeSpeed: 0.001
+        radius: 20,
+        startingSpeed: 5,
+        chargeRadius: 100,
+        chargeSpeed: 0.01,
+        collisionPenalty: 0.75
     },
     map: {
         width: 1000,
@@ -35,7 +36,7 @@ let gameLoop = () => {
             // Increase player speed
             increaseSpeed(player);
         }
-        else movePlayerStraight(player);
+        movePlayerStraight(player);
 
         // Check if player is colliding with anything
         handleObstacleCollision(player);
@@ -50,11 +51,29 @@ let gameLoop = () => {
  * then handles the collision accordingly.
  */
 let handleObstacleCollision = (player) => {
-    // Handle wall collision
-    let verticalWall = (player.location.y - game.playerData.radius <= 0) || (player.location.y + game.playerData.radius >= game.map.height);
-    let horizontalWall = (player.location.x - game.playerData.radius <= 0) || (player.location.x + game.playerData.radius >= game.map.width);
-    if (verticalWall) player.velocity.y *= -1;
-    if (horizontalWall) player.velocity.x *= -1;
+    // Top wall
+    if (player.location.y - game.playerData.radius <= 0) {
+        player.velocity.y *= -1 * game.playerData.collisionPenalty;
+        player.location.y = game.playerData.radius + 1;
+    }
+
+    // Bottom wall
+    else if (player.location.y + game.playerData.radius >= game.map.height) {
+        player.velocity.y *= -1 * game.playerData.collisionPenalty;
+        player.location.y = game.map.height - game.playerData.radius - 1;
+    }
+
+    // Left wall
+    if (player.location.x - game.playerData.radius <= 0) {
+        player.velocity.x *= -1 * game.playerData.collisionPenalty;
+        player.location.x = game.playerData.radius + 1;
+    }
+
+    // Right wall
+    else if (player.location.x + game.playerData.radius >= game.map.width) {
+        player.velocity.x *= -1 * game.playerData.collisionPenalty;
+        player.location.x = game.map.width - game.playerData.radius - 1;
+    }
 }
 
 /*
@@ -137,12 +156,14 @@ let movePlayerCharge = (player) => {
     let speed = Math.sqrt(vX*vX + vY*vY);
     let radians = speed / game.playerData.chargeRadius;
 
+    /*
     // Convert speed to arc length, find point at that arc length
     let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
     let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
     
     // Set player location to new location
     player.location = { x: newX, y: newY };
+    */
 
     // Change player velocity by arc angle
     player.velocity = {
@@ -216,8 +237,8 @@ let removePlayer = (playerId) => {
 let startPlayerCharging = (player) => {
     let speed = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
     player.charging = {
-        x: player.velocity.y / speed * game.playerData.chargeRadius,
-        y: -player.velocity.x / speed * game.playerData.chargeRadius
+        x: player.location.x + (player.velocity.y / speed * game.playerData.chargeRadius),
+        y: player.location.y + (-player.velocity.x / speed * game.playerData.chargeRadius)
     }
 }
 
@@ -234,4 +255,4 @@ let togglePlayerCharging = (playerId) => {
     else startPlayerCharging(player);
 }
 
-module.exports = { gameLoop, addPlayer, removePlayer, togglePlayerCharging };
+module.exports = { gameLoop, addPlayer, removePlayer, startPlayerCharging, stopPlayerCharging };

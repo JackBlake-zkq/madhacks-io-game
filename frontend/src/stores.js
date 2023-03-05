@@ -4,7 +4,7 @@ import { readable, writable } from 'svelte/store';
 export const user = writable(null, set => {
     socket.on("loginSuccessful", user => {
         loginError.set(null);
-        console.log(user);
+        socket.emit("joinGame");
         set(user);
     });
 
