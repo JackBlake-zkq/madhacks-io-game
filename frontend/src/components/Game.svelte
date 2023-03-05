@@ -48,5 +48,6 @@
     svg {
         width: 100vmin;
         height: 100vmin;
+        background-color: var(--lbg);
     }
 </style>

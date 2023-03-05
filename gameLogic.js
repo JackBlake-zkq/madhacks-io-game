@@ -1,7 +1,8 @@
 // Stores the entirety of the game's state.
 let game = {
     playerData: {
-        radius: 20,
+        radius: 30,
+        speedCap: 29.99, // Must be <radius so players can't clip through one another
         startingSpeed: 5,
         chargeRadius: 100,
         chargeSpeed: 0.01,
@@ -10,7 +11,7 @@ let game = {
     map: {
         width: 1000,
         height: 1000,
-        spawnMargin: 20 // The closest players can spawn to the edge of the map
+        spawnMargin: 30 // The closest players can spawn to the edge of the map
     },
     players: {}
 };
@@ -34,7 +35,7 @@ let gameLoop = () => {
         if (player.charging) {
             movePlayerCharge(player);
             // Increase player speed
-            increaseSpeed(player);
+            increaseSpeed(player, game.playerData.chargeSpeed);
         }
         movePlayerStraight(player);
 
@@ -115,20 +116,20 @@ let duel = (player, otherPlayers) => {
 
         // If neither charging, faster speed wins
         if (!player.charging && !otherPlayer.charging) {
-            if (playerVel >= otherVel) kill(otherPlayer);
-            else kill (player);
+            if (playerVel >= otherVel) kill(otherPlayer, player);
+            else kill (player, otherPlayer);
         }
         
         // If both are charging, faster speed wins
         else if (player.charging && otherPlayer.charging) {
-            if (playerVel >= otherVel) kill(otherPlayer);
-            else kill (player);
+            if (playerVel >= otherVel) kill(otherPlayer, player);
+            else kill (player, otherPlayer);
         }
 
         // If one is charging, non-charging wins
         else {
-            if (player.charging) kill(player);
-            else kill(otherPlayer);
+            if (player.charging) kill(player, otherPlayer);
+            else kill(otherPlayer, player);
         }
 
     }
@@ -137,7 +138,9 @@ let duel = (player, otherPlayers) => {
 /*
  * Sets a player's dead flag to true.
  */
-let kill = (player) => {
+let kill = (player, killer) => {
+    let playerSpeed = Math.sqrt(player.velocity.x*player.velocity.x + player.velocity.y*player.velocity.y);
+    increaseSpeed(killer, playerSpeed);
     player.dead = true;
 }
 
@@ -149,21 +152,8 @@ let movePlayerCharge = (player) => {
     // Set up variables
     let vX = player.velocity.x;
     let vY = player.velocity.y;
-    let cX = player.charging.x;
-    let cY = player.charging.y;
-    let pX = player.location.x;
-    let pY = player.location.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
     let radians = speed / game.playerData.chargeRadius;
-
-    /*
-    // Convert speed to arc length, find point at that arc length
-    let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
-    let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
-    
-    // Set player location to new location
-    player.location = { x: newX, y: newY };
-    */
 
     // Change player velocity by arc angle
     player.velocity = {
@@ -176,11 +166,21 @@ let movePlayerCharge = (player) => {
  * Increases the speed of a player by
  * the global charge speed.
  */
-let increaseSpeed = (player) => {
+let increaseSpeed = (player, increase) => {
+    // Add increase to score
+    player.score += increase;
+
+    // Calculate current speed
     let vX = player.velocity.x;
     let vY = player.velocity.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
-    let newSpeed = speed + game.playerData.chargeSpeed;
+
+    // Multiply increase based on current speed
+    let capDiff = game.playerData.speedCap - speed;
+    let multiplier = capDiff / speedCap;
+
+    // Calculate new speed
+    let newSpeed = speed + (increase*multiplier);
     vX = vX / Math.sqrt(speed) * Math.sqrt(newSpeed);
     vY = vY / Math.sqrt(speed) * Math.sqrt(newSpeed);
     player.velocity = { x: vX, y: vY };
@@ -203,6 +203,7 @@ let addPlayer = (user) => {
     // Add player flags
     user.charging = null; // Will contain center point of charging circle if currently charging
     user.dead = false;
+    user.score = game.playerData.startingSpeed;
 
     // Set new player location
     let spawnPadding = game.playerData.radius + game.map.spawnMargin;
@@ -247,12 +248,6 @@ let startPlayerCharging = (player) => {
  */
 let stopPlayerCharging = (player) => {
     player.charging = null;
-}
-
-let togglePlayerCharging = (playerId) => {
-    let player = game.players[playerId];
-    if (player.charging) stopPlayerCharging(player);
-    else startPlayerCharging(player);
 }
 
 module.exports = { gameLoop, addPlayer, removePlayer, startPlayerCharging, stopPlayerCharging };
