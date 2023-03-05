@@ -2,6 +2,7 @@
     --bg: #001225;
     --c1: #ffb2ee;
     --c2: #ace2ff;
+    --lbg:#33598c;
 }
 html {
     color: var(--c2);
