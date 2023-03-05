@@ -180,7 +180,7 @@ let increaseSpeed = (player, increase) => {
     let multiplier = capDiff / speedCap;
 
     // Calculate new speed
-    let newSpeed = speed + (increase*speedCap);
+    let newSpeed = speed + (increase*multiplier);
     vX = vX / Math.sqrt(speed) * Math.sqrt(newSpeed);
     vY = vY / Math.sqrt(speed) * Math.sqrt(newSpeed);
     player.velocity = { x: vX, y: vY };
