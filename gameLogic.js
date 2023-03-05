@@ -4,7 +4,7 @@ let game = {
         radius: 20,
         startingSpeed: 5,
         chargeRadius: 100,
-        chargeSpeed: 0
+        chargeSpeed: 0.01
     },
     map: {
         width: 1000,
@@ -33,7 +33,7 @@ let gameLoop = () => {
         if (player.charging) {
             movePlayerCharge(player);
             // Increase player speed
-            //increaseSpeed(player); // TODO
+            increaseSpeed(player);
         }
         movePlayerStraight(player);
 
