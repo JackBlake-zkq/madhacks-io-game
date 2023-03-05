@@ -3,7 +3,8 @@ let game = {
     playerData: {
         radius: 5,
         startingSpeed: 5,
-        chargeRadius: 20
+        chargeRadius: 20,
+        chargeSpeed: 0.1
     },
     map: {
         width: 500,
@@ -28,7 +29,11 @@ let gameLoop = () => {
         let player = players[i];
 
         // Move player
-        if (player.charging) movePlayerCharge(player);
+        if (player.charging) {
+            movePlayerCharge(player);
+            // Increase player speed
+            increaseSpeed(player);
+        }
         else movePlayerStraight(player);
 
         // Check if player is colliding with anything
@@ -133,6 +138,28 @@ let movePlayerCharge = (player) => {
     
     // Set player position to new position
     player.position = { x: newX, y: newY };
+
+    // Change player velocity by arc angle
+    let vX = player.velocity.x;
+    let vY = player.velocity.y;
+    player.velocity = {
+        x: Math.cos(radians)*vX - Math.sin(radians)*vY,
+        y: Math.sin(radians)*vX + Math.cos(radians)*vY
+    };
+}
+
+/*
+ * Increases the speed of a player by
+ * the global charge speed.
+ */
+let increaseSpeed = (player) => {
+    let vX = player.velocity.x;
+    let vY = player.velocity.y;
+    let speed = Math.sqrt(vX*vX + vY*vY);
+    let newSpeed = speed + game.playerData.chargeSpeed;
+    vX = vX / Math.sqrt(speed) * Math.sqrt(newSpeed);
+    vY = vY / Math.sqrt(speed) * Math.sqrt(newSpeed);
+    player.velocity = { x: vX, y: vY };
 }
 
 /*
