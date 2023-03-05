@@ -55,24 +55,28 @@ let handleObstacleCollision = (player) => {
     // Top wall
     if (player.location.y - game.playerData.radius <= 0) {
         player.velocity.y *= -1 * game.playerData.collisionPenalty;
+        player.score *= game.playerData.collisionPenalty;
         player.location.y = game.playerData.radius + 1;
     }
 
     // Bottom wall
     else if (player.location.y + game.playerData.radius >= game.map.height) {
         player.velocity.y *= -1 * game.playerData.collisionPenalty;
+        player.score *= game.playerData.collisionPenalty;
         player.location.y = game.map.height - game.playerData.radius - 1;
     }
 
     // Left wall
     if (player.location.x - game.playerData.radius <= 0) {
         player.velocity.x *= -1 * game.playerData.collisionPenalty;
+        player.score *= game.playerData.collisionPenalty;
         player.location.x = game.playerData.radius + 1;
     }
 
     // Right wall
     else if (player.location.x + game.playerData.radius >= game.map.width) {
         player.velocity.x *= -1 * game.playerData.collisionPenalty;
+        player.score *= game.playerData.collisionPenalty;
         player.location.x = game.map.width - game.playerData.radius - 1;
     }
 }
