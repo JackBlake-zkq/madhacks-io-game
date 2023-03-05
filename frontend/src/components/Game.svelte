@@ -1,12 +1,14 @@
 <script>
     import { gameState, user } from "../stores";
     import socket from "../socket";
-    import DeathScreen from "./DeathScreen.svelte";
-    import Leaderboard from "./Leaderboard.svelte";
-    import Instructions from "./Instructions.svelte";
     $: radius = $gameState?.playerData?.radius;
     const keydown = () => socket.emit("keydown");
     const keyup = () => socket.emit("keyup");
+    let down = false;
+    $: {
+        if(down) keydown();
+        else keyup();
+    }
 </script>
 
 <main>
@@ -16,8 +18,9 @@
                     {#if !player.dead}
                         <g transform={`translate(${player.location.x}, ${player.location.y})`}>
                             {#if id == $user.id}
-                                <circle r={radius + 1} fill="#ffb2ee"/>
+                                <circle r={radius * 1.2} fill="green"/>
                             {/if}
+                            <circle r={radius} fill="gray"/>
                             <image 
                                 x={-radius} 
                                 y={-radius} 
@@ -30,24 +33,27 @@
                 {/each}
         </svg>
     {/if}
-    <DeathScreen/>
-    <Leaderboard/>
-    <Instructions/>
 </main>
 
-<svelte:window on:keydown={keydown} on:keyup={keyup} on:mousedown={keydown} on:mouseup={keyup}/>
+<svelte:window 
+    on:keydown={() => down = true} 
+    on:keyup={() => down = false} 
+    on:mousedown={() => down = true} 
+    on:mouseup={() => down = false}
+/>
 
 <style>
     main {
-        width: 100vw;
+        width: 50vw;
         height: 100vh;
-        display: flex;
-        justify-content: center;
-        justify-items: center;
+        position: relative;
     }
     svg {
-        width: 100vmin;
-        height: 100vmin;
+        width: 50vw;
+        height: 50vw;
         background-color: var(--lbg);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
 </style>

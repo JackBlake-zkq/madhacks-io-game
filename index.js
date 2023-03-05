@@ -15,8 +15,15 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 let currID = 0;
+let loop = null;
 
 io.on("connection", socket => {
+    if(!loop) {
+        loop = setInterval(() => {
+            let state = gameLoop();
+            io.emit("gameTick", state);
+        }, 10);
+    }
     let user;
     socket.on("login", async input => {
         let userData = {
@@ -57,14 +64,15 @@ io.on("connection", socket => {
         if(user) stopPlayerCharging(user);
     });
     socket.on('disconnect', () => {
-        if(user) removePlayer(user.id);
+        if(user) {
+            let playerCount = removePlayer(user.id);
+            if(playerCount < 1) {
+                clearInterval(loop);
+                loop = null;
+            }
+        }
     });
 });
-
-setInterval(() => {
-    let state = gameLoop();
-    io.emit("gameTick", state);
-}, 10);
     
 
 const port = process.env.PORT || 3000;

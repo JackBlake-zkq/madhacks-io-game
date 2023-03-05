@@ -1,29 +1,43 @@
 <script>
     import { gameState, user } from "../stores";
-    const vNorm = player => Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
-    $: leaderboard = $gameState ? Object.values($gameState.players).sort((a, b) => vNorm(a) < vNorm(b) ? 1 : -1) : [];
+    $: leaderboard = $gameState ? Object.values($gameState.players).sort((a, b) => a.score < b.score ? 1 : -1) : [];
 </script>
 
 <main>
-    <h1>Leaderboard</h1>
-    <table>
-        <tr><th>Player</th><th>Velocity</th></tr>
-        {#each leaderboard as player}
-            {#if !player.dead}
-                <tr><th>{player.name}</th><th>{Math.round(vNorm(player) * 10) / 10}</th></tr>
-            {/if}
-        {/each}
-    </table>
+    <div>
+        <h1>Leaderboard</h1>
+        <table>
+            <tr><th>Player</th><th>Score</th></tr>
+            {#each leaderboard as player}
+                {#if !player.dead}
+                    <tr class={player.id == $user.id ? 'highlighted' : ''}>
+                        <th>{player.name}</th><th>{Math.round(player.score * 10) / 10}</th>
+                    </tr>
+                {/if}
+            {/each}
+        </table>
+    </div>
 </main>
 
 <style>
     main {
+        width: 20vw;
+        position: relative;
+        height: 100vh;
+    }
+    div {
+        width: 20vw;
+        height: 50vw;
+        padding: 2rem;
         position: absolute;
-        right: 0;
-        top: 0;
-        width: 25vmin;
-        padding: 1rem;
-        overflow: scroll;
-        max-height: 100vh;
+        top: 50%; 
+        transform: translateY(-50%);
+        overflow-y: scroll;
+    }
+    .highlighted {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+    h1 {
+        text-align: center;
     }
 </style>

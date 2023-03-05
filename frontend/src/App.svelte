@@ -1,5 +1,5 @@
 <script>
-    import Game from "./components/Game.svelte";
+    import GameScreen from "./components/GameScreen.svelte";
     import Login from "./components/Login.svelte";
     import { user } from "./stores"
 </script>
@@ -8,7 +8,7 @@
     {#if !$user}
         <Login/>
     {:else}
-        <Game/>
+        <GameScreen/>
     {/if}
 </main>
 

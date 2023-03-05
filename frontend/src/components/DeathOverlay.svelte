@@ -6,7 +6,7 @@
 
 {#if dead}
 <main>
-    <div class="center">
+    <div>
         <h1>You died!</h1>
         <button on:click={() => socket.emit("joinGame")}>Play Again</button>
     </div>
@@ -23,18 +23,27 @@
         left: 0;
         top: 0;
     }
+    main div {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        position: absolute;
+    }
     h1 {
-        color: var(--c1);
+        color: var(--text-dark);
     }
     button {
-        margin:0 auto;
         display:block;
         margin-top: 1rem;
         height:2rem;
-        width:100%;
-        background-color: var(--c2);
+        width: 10rem;
+        background-color: rgba(0,0,0, 0.3);
         border: none;
         border-radius: 0.5rem;
-        color: rgb(255, 255, 255);
+        color: var(--text-light);
+    }
+    button:hover {
+        background-color: rgba(0,0,0, 0.2);
+        cursor: pointer;
     }
 </style>
