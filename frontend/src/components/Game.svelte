@@ -1,7 +1,7 @@
 <script>
     import { gameState, user } from "../stores";
     import socket from "../socket";
-    $: radius = $gameState?.playerData?.radius;
+    $: radius = $gameState?.gameData?.radius;
     const keydown = () => socket.emit("keydown");
     const keyup = () => socket.emit("keyup");
     let down = false;

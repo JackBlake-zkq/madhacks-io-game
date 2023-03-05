@@ -1,19 +1,17 @@
 // Stores the entirety of the game's state.
 let game = {
-    playerData: {
+    gameData: {
         radius: 30,
         speedCap: 29.99, // Must be <radius so players can't clip through one another
         startingSpeed: 5,
         chargeRadius: 100,
         chargeSpeed: 0.01,
         collisionPenalty: 0.75,
-        playerCount: 0
-    },
-    map: {
+        playerCount: 0,
         width: 1000,
         height: 1000,
         spawnMargin: 30, // The closest players can spawn to the edge of the map
-        minPlayers: 5,
+        minPlayers: 3,
         botCount: 0,
         botID: 0
     },
@@ -30,7 +28,7 @@ let game = {
  */
 let gameLoop = () => {
     // Add bots if player count is less than minimum
-    while (game.playerData.playerCount + game.map.botCount < game.map.minPlayers) {
+    while (game.gameData.playerCount + game.gameData.botCount < game.gameData.minPlayers) {
         addBot();
     }
 
@@ -44,7 +42,7 @@ let gameLoop = () => {
         if (player.charging) {
             movePlayerCharge(player);
             // Increase player speed
-            increaseSpeed(player, game.playerData.chargeSpeed);
+            increaseSpeed(player, game.gameData.chargeSpeed);
         }
         movePlayerStraight(player);
 
@@ -62,31 +60,31 @@ let gameLoop = () => {
  */
 let handleObstacleCollision = (player) => {
     // Top wall
-    if (player.location.y - game.playerData.radius <= 0) {
-        player.velocity.y *= -1 * game.playerData.collisionPenalty;
-        player.score *= game.playerData.collisionPenalty;
-        player.location.y = game.playerData.radius + 1;
+    if (player.location.y - game.gameData.radius <= 0) {
+        player.velocity.y *= -1 * game.gameData.collisionPenalty;
+        player.score *= game.gameData.collisionPenalty;
+        player.location.y = game.gameData.radius + 1;
     }
 
     // Bottom wall
-    else if (player.location.y + game.playerData.radius >= game.map.height) {
-        player.velocity.y *= -1 * game.playerData.collisionPenalty;
-        player.score *= game.playerData.collisionPenalty;
-        player.location.y = game.map.height - game.playerData.radius - 1;
+    else if (player.location.y + game.gameData.radius >= game.gameData.height) {
+        player.velocity.y *= -1 * game.gameData.collisionPenalty;
+        player.score *= game.gameData.collisionPenalty;
+        player.location.y = game.gameData.height - game.gameData.radius - 1;
     }
 
     // Left wall
-    if (player.location.x - game.playerData.radius <= 0) {
-        player.velocity.x *= -1 * game.playerData.collisionPenalty;
-        player.score *= game.playerData.collisionPenalty;
-        player.location.x = game.playerData.radius + 1;
+    if (player.location.x - game.gameData.radius <= 0) {
+        player.velocity.x *= -1 * game.gameData.collisionPenalty;
+        player.score *= game.gameData.collisionPenalty;
+        player.location.x = game.gameData.radius + 1;
     }
 
     // Right wall
-    else if (player.location.x + game.playerData.radius >= game.map.width) {
-        player.velocity.x *= Math.max(-1 * game.playerData.collisionPenalty);
-        player.score *= game.playerData.collisionPenalty;
-        player.location.x = game.map.width - game.playerData.radius - 1;
+    else if (player.location.x + game.gameData.radius >= game.gameData.width) {
+        player.velocity.x *= Math.max(-1 * game.gameData.collisionPenalty);
+        player.score *= game.gameData.collisionPenalty;
+        player.location.x = game.gameData.width - game.gameData.radius - 1;
     }
 }
 
@@ -98,7 +96,7 @@ let getPlayerDistance = (player, otherPlayer) => {
         let distX = otherPlayer.location.x - player.location.x;
         let distY = otherPlayer.location.y - player.location.y;
         let dist = Math.sqrt(distX*distX + distY*distY);
-        return dist - (game.playerData.radius * 2);
+        return dist - (game.gameData.radius * 2);
 }
 
 /*
@@ -173,7 +171,7 @@ let movePlayerCharge = (player) => {
     let vX = player.velocity.x;
     let vY = player.velocity.y;
     let speed = Math.sqrt(vX*vX + vY*vY);
-    let radians = speed / game.playerData.chargeRadius;
+    let radians = speed / game.gameData.chargeRadius;
 
     // Change player velocity by arc angle
     player.velocity = {
@@ -196,8 +194,8 @@ let increaseSpeed = (player, increase) => {
     let speed = Math.sqrt(vX*vX + vY*vY);
 
     // Multiply increase based on current speed
-    let capDiff = game.playerData.speedCap - speed;
-    let multiplier = capDiff / game.playerData.speedCap;
+    let capDiff = game.gameData.speedCap - speed;
+    let multiplier = capDiff / game.gameData.speedCap;
 
     // Calculate new speed
     let newSpeed = speed + (increase*multiplier);
@@ -221,7 +219,8 @@ let movePlayerStraight = (player) => {
 let addBot = () => {
     let bot = {
         pfp: "https://tr.rbxcdn.com/0de420f369ee4d3948fd3b10b60cd8c9/420/420/Hat/Png",
-        id: "bot" + game.map.botID,
+        id: "bot" + game.gameData.botID,
+        name: "bot" + game.gameData.botID,
         charging: null,
         dead: false,
         score: 0,
@@ -232,8 +231,8 @@ let addBot = () => {
 
     game.players[bot.id] = bot;
 
-    game.map.botCount++;
-    game.map.botID++;
+    game.gameData.botCount++;
+    game.gameData.botID++;
 }
 
 /*
@@ -242,7 +241,7 @@ let addBot = () => {
  * removes the bot.
  */
 let respawnBot = (id) => {
-    if(game.playerData.playerCount + game.map.botCount >= game.playerData.minPlayers){
+    if(game.gameData.playerCount + game.gameData.botCount > game.gameData.minPlayers){
         console.log("removing bot");
         removeBot(id);
     } else {
@@ -254,12 +253,12 @@ let respawnBot = (id) => {
 }
 
 let getSpawnLocation = () => {
-    let spawnPadding = game.playerData.radius + game.map.spawnMargin;
+    let spawnPadding = game.gameData.radius + game.gameData.spawnMargin;
 
     // Generate random location in the map
     let position = {
-        x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
-        y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
+        x: (Math.random() * (game.gameData.width - 2*spawnPadding)) + spawnPadding,
+        y: (Math.random() * (game.gameData.height - 2*spawnPadding)) + spawnPadding
     }
 
     // Test each player in the map to make sure the new
@@ -280,8 +279,8 @@ let getSpawnVelocity = () => {
     let velNormX = Math.random();
     let velNormY = Math.sqrt(1 - velNormX*velNormX);
     return {
-        x: velNormX * Math.sqrt(game.playerData.startingSpeed),
-        y: velNormY * Math.sqrt(game.playerData.startingSpeed)
+        x: velNormX * Math.sqrt(game.gameData.startingSpeed),
+        y: velNormY * Math.sqrt(game.gameData.startingSpeed)
     };
 }
 
@@ -294,7 +293,7 @@ let addPlayer = (user) => {
     // Add player flags
     user.charging = null; // Will contain center point of charging circle if currently charging
     user.dead = false;
-    user.score = game.playerData.startingSpeed;
+    user.score = game.gameData.startingSpeed;
 
     // Set new player location
     user.location = getSpawnLocation();
@@ -304,7 +303,7 @@ let addPlayer = (user) => {
 
     // Add new player to player list
     game.players[user.id] = user;
-    game.playerData.playerCount++;
+    game.gameData.playerCount++;
 }
 
 /*
@@ -312,7 +311,7 @@ let addPlayer = (user) => {
 */
 let removePlayer = (playerId) => {
     delete game.players[playerId];
-    return game.playerData.playerCount--;
+    return game.gameData.playerCount--;
 }
 
 /*
@@ -320,7 +319,7 @@ let removePlayer = (playerId) => {
 */
 let removeBot = (botId) => {
     delete game.players[botId];
-    return game.playerData.botCount--;
+    return game.gameData.botCount--;
 }
 
 /*
@@ -330,8 +329,8 @@ let removeBot = (botId) => {
 let startPlayerCharging = (player) => {
     let speed = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
     player.charging = {
-        x: player.location.x + (player.velocity.y / speed * game.playerData.chargeRadius),
-        y: player.location.y + (-player.velocity.x / speed * game.playerData.chargeRadius)
+        x: player.location.x + (player.velocity.y / speed * game.gameData.chargeRadius),
+        y: player.location.y + (-player.velocity.x / speed * game.gameData.chargeRadius)
     }
 }
 
