@@ -7,7 +7,7 @@ const http = require('http');
 
 const axios = require('axios');
 
-const { gameLoop, addPlayer, removePlayer, togglePlayerCharging } = require("./gameLogic");
+const { gameLoop, addPlayer, removePlayer, startPlayerCharging, stopPlayerCharging } = require("./gameLogic");
 
 const server = http.createServer(app);
 
@@ -48,13 +48,13 @@ io.on("connection", socket => {
     });
     
     socket.on("joinGame", () => {
-        addPlayer(user);
+        if(user) addPlayer(user);
     });
     socket.on("keydown", () => {
-        togglePlayerCharging(user.id);
+        if(user) startPlayerCharging(user);
     });
     socket.on("keyup", () => {
-        togglePlayerCharging(user.id);
+        if(user) stopPlayerCharging(user);
     });
     socket.on('disconnect', () => {
         if(user) removePlayer(user.id);
