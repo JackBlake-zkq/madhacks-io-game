@@ -242,14 +242,13 @@ let addBot = () => {
  * removes the bot.
  */
 let respawnBot = (id) => {
-    if (game.playerData.playerCount + game.map.botCount < game.map.minPlayers) {
+    if(game.playerData.playerCount + game.map.botCount > minPlayers){
+        removeBot(id);
+    } else {
         let bot = game.players[id];
         bot.location = getSpawnLocation();
         bot.velocity = getSpawnVelocity();
         bot.dead = false;
-    } else {
-        removePlayer(id);
-        game.map.botCount--;
     }
 }
 
@@ -311,7 +310,15 @@ let addPlayer = (user) => {
 */
 let removePlayer = (playerId) => {
     delete game.players[playerId];
-    return Object.keys(game.players).length;
+    return game.playerData.playerCount--;
+}
+
+/*
+ * Removes a player from the player list.
+*/
+let removeBot = (botId) => {
+    delete game.players[botId];
+    return game.playerData.botCount--;
 }
 
 /*
