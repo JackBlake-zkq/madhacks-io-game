@@ -1,5 +1,6 @@
 <script>
     import socket from '../socket';
+    import { loginError } from "../stores";
     let username = "";
     let pass = "";
     function login() {
@@ -8,6 +9,11 @@
 </script>
 
 <main >
+    {#if $loginError}
+        <div class="alert">
+            {$loginError}
+        </div>
+    {/if}
     <h1 >(Name)</h1>
     <p class = "center">If you want to use your roblox avatar enter your roblox username!</p>
         <div class = "center" >
@@ -56,4 +62,12 @@
         color: #ffb2ee;
         background:transparent
     }
+    /* The alert message box */
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  margin-bottom: 15px;
+}
+
 </style>
