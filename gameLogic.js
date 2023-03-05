@@ -6,12 +6,16 @@ let game = {
         startingSpeed: 5,
         chargeRadius: 100,
         chargeSpeed: 0.01,
-        collisionPenalty: 0.75
+        collisionPenalty: 0.75,
+        playerCount: 0
     },
     map: {
         width: 1000,
         height: 1000,
-        spawnMargin: 30 // The closest players can spawn to the edge of the map
+        spawnMargin: 30, // The closest players can spawn to the edge of the map
+        minPlayers: 5,
+        botCount: 0,
+        botID: 0
     },
     players: {}
 };
@@ -25,6 +29,11 @@ let game = {
  * Returns the current game state.
  */
 let gameLoop = () => {
+    // Add bots if player count is less than minimum
+    while (gamep.playerdata.playerCount + game.map.botCount < game.map.minPlayers) {
+        addBot();
+    }
+
     // Loop through each player
     let players = Object.values(game.players);
     for (let i = 0; i < players.length; i++) {
@@ -75,7 +84,7 @@ let handleObstacleCollision = (player) => {
 
     // Right wall
     else if (player.location.x + game.playerData.radius >= game.map.width) {
-        player.velocity.x *= -1 * game.playerData.collisionPenalty;
+        player.velocity.x *= Math.max(-1 * game.playerData.collisionPenalty);
         player.score *= game.playerData.collisionPenalty;
         player.location.x = game.map.width - game.playerData.radius - 1;
     }
@@ -146,6 +155,7 @@ let kill = (player, killer) => {
     let playerSpeed = Math.sqrt(player.velocity.x*player.velocity.x + player.velocity.y*player.velocity.y);
     increaseSpeed(killer, playerSpeed);
     player.dead = true;
+    if (player.isBot) respawnBot(player.id);
 }
 
 /*
@@ -199,6 +209,57 @@ let movePlayerStraight = (player) => {
 }
 
 /*
+ * Adds a bot to the map.  A bot is a player object who
+ * isn't controlled by a real player.
+*/
+let addBot = () => {
+    let bot = {
+        pfp: "https://tr.rbxcdn.com/0de420f369ee4d3948fd3b10b60cd8c9/420/420/Hat/Png",
+        id: "bot" + game.map.botID,
+        charging: null,
+        dead: false,
+        score: 0,
+        bot: true,
+        location: getSpawnLocation(),
+        velocity: getSpawnVelocity()
+    };
+
+    game.players[bot.id] = bot;
+
+    game.map.botCount++;
+    game.map.botID++;
+}
+
+let respawnBot = (id) => {
+    if (game.playerData.playerCount + game.map.botCount < game.map.minPlayers) {
+        let bot = game.players[id];
+        bot.location = getSpawnLocation();
+        bot.velocity = getSpawnVelocity();
+        bot.dead = false;
+    } else {
+        removePlayer(id);
+        game.map.botCount--;
+    }
+}
+
+let getSpawnLocation = () => {
+    let spawnPadding = game.playerData.radius + game.map.spawnMargin;
+    return {
+        x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
+        y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
+    };
+}
+
+let getSpawnVelocity = () => {
+    let velNormX = Math.random();
+    let velNormY = Math.sqrt(1 - velNormX*velNormX);
+    return {
+        x: velNormX * Math.sqrt(game.playerData.startingSpeed),
+        y: velNormY * Math.sqrt(game.playerData.startingSpeed)
+    };
+}
+
+/*
  * Adds a player to the player list.
  * 
  * user: the player object taken from the Roblox API.
@@ -210,19 +271,10 @@ let addPlayer = (user) => {
     user.score = game.playerData.startingSpeed;
 
     // Set new player location
-    let spawnPadding = game.playerData.radius + game.map.spawnMargin;
-    user.location = {
-        x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
-        y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
-    };
+    user.location = getSpawnLocation();
 
     // Set new player velocity
-    let velNormX = Math.random();
-    let velNormY = Math.sqrt(1 - velNormX*velNormX);
-    user.velocity = {
-        x: velNormX * Math.sqrt(game.playerData.startingSpeed),
-        y: velNormY * Math.sqrt(game.playerData.startingSpeed)
-    };
+    user.velocity = getSpawnVelocity();
 
     // Add new player to player list
     game.players[user.id] = user;
