@@ -1,39 +1,41 @@
 <script>
     import { gameState, user } from "../stores";
     import socket from "../socket";
-    // $: userPos = $gameState.players[$user.id].location
-    // let height;
-    // let width;
-    // $: viewPortWidth = $gameState.playerData.radius * 30;
-    // $: viewPortHeight = viewPortWidth * (height / width);
+    import DeathScreen from "./DeathScreen.svelte";
+    import Leaderboard from "./Leaderboard.svelte";
+    import Instructions from "./Instructions.svelte";
     $: radius = $gameState?.playerData?.radius;
+    const keydown = () => socket.emit("keydown");
+    const keyup = () => socket.emit("keyup");
 </script>
 
-<!-- bind:clientHeight={height} bind:clientWidth={width} -->
 <main>
     {#if $gameState}
         <svg viewBox={`0 0 ${$gameState.map.width} ${$gameState.map.height}`}>
-            <!-- <g transform={`translate(${userPos.x / 2 + viewPortWidth / 2}, ${userPos.y / 2 + viewPortHeight / 2})`}>  -->
                 {#each Object.entries($gameState.players) as [id, player]}
-                    <g transform={`translate(${player.location.x}, ${player.location.y})`}>
-                        {#if id == $user.id}
-                            <circle r={radius + 1} fill="#ffb2ee"/>
-                        {/if}
-                        <image 
-                            x={-radius} 
-                            y={-radius} 
-                            xlink:href={player.pfp} 
-                            width={2 * radius}
-                            height={2 * radius}
-                        />
-                    </g>
+                    {#if !player.dead}
+                        <g transform={`translate(${player.location.x}, ${player.location.y})`}>
+                            {#if id == $user.id}
+                                <circle r={radius + 1} fill="#ffb2ee"/>
+                            {/if}
+                            <image 
+                                x={-radius} 
+                                y={-radius} 
+                                xlink:href={player.pfp} 
+                                width={2 * radius}
+                                height={2 * radius}
+                            />
+                        </g>
+                    {/if}
                 {/each}
-            <!-- </g> -->
         </svg>
     {/if}
+    <DeathScreen/>
+    <Leaderboard/>
+    <Instructions/>
 </main>
 
-<svelte:window on:keydown={() => socket.emit("keydown")} on:keyup={() => socket.emit("keyup")}/>
+<svelte:window on:keydown={keydown} on:keyup={keyup} on:mousedown={keydown} on:mouseup={keyup}/>
 
 <style>
     main {
