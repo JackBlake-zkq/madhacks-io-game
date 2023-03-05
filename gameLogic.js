@@ -52,7 +52,7 @@ let gameLoop = () => {
 let handleObstacleCollision = (player) => {
     // Top wall
     if (player.location.y - game.playerData.radius <= 0) {
-        player.velocty.y *= -1;
+        player.velocity.y *= -1;
         player.location.y = game.playerData.radius + 1;
     }
 
