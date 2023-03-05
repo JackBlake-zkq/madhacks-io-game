@@ -12,10 +12,10 @@
 
 <style>
     main {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 25vmin;
+        display: inline-block;
+        width: 25vw;
+        max-height: 100vh;
         padding: 2rem;
+        overflow: scroll;
     }
 </style>

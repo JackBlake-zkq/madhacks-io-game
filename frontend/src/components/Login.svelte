@@ -8,66 +8,84 @@
     }
 </script>
 
+{#if $loginError}
+    <div class="alert">
+        {$loginError}
+    </div>
+{/if}
 <main >
-    {#if $loginError}
-        <div class="alert">
-            {$loginError}
+    <h1>R<img src="roblox.svg" alt="Roblox Logo" class="roblox"/>BUG<img src="bug.svg" alt="Bug Icon"/></h1>
+    <p class = "center">If you want to use your roblox avatar, enter your roblox username!</p>
+    <p class = "center">Otherwise, enter any user name:</p>
+    <div class="flexCenter">
+        <div>
+            <input 
+                bind:value={username} 
+                on:keypress={e => { if(e.keyCode == 13) login() }}
+                placeholder="username" type="username"
+            />
+            <button on:click={login}>Play</button>
         </div>
-    {/if}
-    <h1>ROBUG</h1>
-    <p class = "center">If you want to use your roblox avatar enter your roblox username!</p>
-        <div class = "center" >
-            <input bind:value={username} placeholder="username" type = "username">
-            <button on:click={login}>Login</button>
-        </div>
+    </div>
 </main>
 
 <style>
-    *{
-        box-sizing: border-box;
+    .flexCenter {
+        display: flex;
+        justify-content: center;
     }
-    input {
-        display: block;
-        height: 3rem;
-        width: 300px;
-        text-align: center;
-        background-color: var(--bg);
-        filter: brightness(3);
-        border: none;
-        border-radius: 0.5rem;
-        margin-top: 8rem;
-    }
-    input[type="username"]{
-        color:rgb(146, 146, 146);
+    .roblox {
+        margin-left: -1rem;
+        margin-right: -1rem;
     }
     h1 {
         text-align: center;
-        margin-top: 7rem;
         font-size: 10rem;
         font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        display: block;
     }
-    button{
-        margin:0 auto;
-        display:block;
+    p {
+        display: block;
+        text-align: center;
+    }
+    img {
+        width: 10rem;
+        height: 10rem;
+    }
+    input[type="username"]{
+        display: block;
+        height: 3rem;
+        width: 20rem;
+        border: none;
+        border-radius: 0.5rem;
+        text-align: center;
+        color: var(--text-dark);
+        background-color: rgba(255, 255, 255, 0.5);
         margin-top: 1rem;
-        height:2rem;
-        width:40%;
-        background-color: var(--c2);
+    }
+    button {
+        display:block;
+        height: 2rem;
+        width: 20rem;
+        background-color: rgba(255, 255, 255, 0.8);
         border: none;
         border-radius: 0.5rem;
         filter: brightness(.85);
-        color: rgb(255, 255, 255);
+        color: var(--text-dark);
+        margin-top: 1rem;
     }
-    ::selection {
-        color: #ffb2ee;
-        background:transparent
+    button:hover {
+        background-color: rgba(255, 255, 255, 0.9);
+        cursor: pointer;
     }
-    /* The alert message box */
-.alert {
-  padding: 20px;
-  background-color: #f44336; /* Red */
-  color: white;
-  margin-bottom: 15px;
-}
+    .alert {
+        padding: 1.5rem;
+        background-color: #950a00;
+        color: rgb(255, 237, 237);
+        margin-bottom: 1rem;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
 
 </style>

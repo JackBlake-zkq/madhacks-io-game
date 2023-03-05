@@ -31,7 +31,7 @@
         display:block;
         margin-top: 1rem;
         height:2rem;
-        width:100%;
+        width: 10rem;
         background-color: var(--c2);
         border: none;
         border-radius: 0.5rem;

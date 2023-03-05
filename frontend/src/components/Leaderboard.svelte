@@ -19,13 +19,11 @@
 
 <style>
     main {
-        position: absolute;
-        right: 0;
-        top: 0;
-        width: 25vmin;
-        padding: 1rem;
-        overflow: scroll;
+        display: inline-block;
+        width: 25vw;
         max-height: 100vh;
+        padding: 2rem;
+        overflow: scroll;
     }
     .highlighted {
         background-color: rgba(255, 255, 255, 0.3);
