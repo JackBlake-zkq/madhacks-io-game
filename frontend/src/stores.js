@@ -3,6 +3,7 @@ import { readable, writable } from 'svelte/store';
 
 export const user = writable(null, set => {
     socket.on("loginSuccessful", user => {
+        loginError.set(null);
         socket.emit("joinGame");
         set(user);
     });
@@ -17,6 +18,12 @@ export const user = writable(null, set => {
     //     }
     // });
 });
+
+export const loginError = writable(null, set =>{
+    socket.on("loginFailed", msg =>{
+        set("Login failed: " + msg);
+    })
+})
 
 export const gameState = readable(null, set => {
     socket.on("gameTick", game => {
