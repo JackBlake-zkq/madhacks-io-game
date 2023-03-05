@@ -91,6 +91,17 @@ let handleObstacleCollision = (player) => {
 }
 
 /*
+ * Returns the distance between two players,
+ * accounting for the radius of a player.
+ */
+let getPlayerDistance = (player, otherPlayer) => {
+        let distX = otherPlayer.location.x - player.location.x;
+        let distY = otherPlayer.location.y - player.location.y;
+        let dist = Math.sqrt(distX*distX + distY*distY);
+        return dist - (game.playerData.radius * 2);
+}
+
+/*
  * Checks if the player is colliding with another player,
  * then handles the collision by killing one of the players.
 */
@@ -106,13 +117,8 @@ let handlePlayerCollision = (player, index) => {
         let otherPlayer = players[i];
         if (otherPlayer.dead) continue;
         
-        // Find distance between the centers of the players
-        let distX = otherPlayer.location.x - player.location.x;
-        let distY = otherPlayer.location.y - player.location.y;
-        let dist = Math.sqrt(distX*distX + distY*distY);
-
         // If distance between the edges of the players <0, they're colliding
-        if (dist - (game.playerData.radius * 2) <= 0) colliding.push(otherPlayer);
+        if (getPlayerDistance(player, otherPlayer) <= 0) colliding.push(otherPlayer);
     }
 
     // Handle conflict and kill losing player
@@ -230,6 +236,11 @@ let addBot = () => {
     game.map.botID++;
 }
 
+/*
+ * Respawns a bot as long as the total player count
+ * is still below the minimum players, otherwise
+ * removes the bot.
+ */
 let respawnBot = (id) => {
     if (game.playerData.playerCount + game.map.botCount < game.map.minPlayers) {
         let bot = game.players[id];
@@ -244,10 +255,25 @@ let respawnBot = (id) => {
 
 let getSpawnLocation = () => {
     let spawnPadding = game.playerData.radius + game.map.spawnMargin;
-    return {
+
+    // Generate random location in the map
+    let position = {
         x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
         y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
+    }
+
+    // Test each player in the map to make sure the new
+    // location isn't overlapping with any players
+    let dummyPlayer = {
+        location: position
     };
+
+    for (player of game.players.values()) {
+        if (getPlayerDistance(dummyPlayer, player) <= 0) return getSpawnLocation();
+    }
+
+    // If no collisions, return the stored position
+    return position;
 }
 
 let getSpawnVelocity = () => {
