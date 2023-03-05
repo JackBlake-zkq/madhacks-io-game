@@ -2,13 +2,13 @@
 let game = {
     playerData: {
         radius: 5,
-        startingSpeed: 5,
+        startingSpeed: 0.5,
         chargeRadius: 20,
-        chargeSpeed: 0.1
+        chargeSpeed: 0.001
     },
     map: {
-        width: 500,
-        height: 500,
+        width: 20000,
+        height: 20000,
         spawnMargin: game.playerData.radius // The closest players can spawn to the edge of the map
     },
     players: {}
