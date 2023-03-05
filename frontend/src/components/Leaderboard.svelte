@@ -4,28 +4,41 @@
 </script>
 
 <main>
-    <h1>Leaderboard</h1>
-    <table>
-        <tr><th>Player</th><th>Score</th></tr>
-        {#each leaderboard as player}
-            {#if !player.dead}
-                <tr class={player.id == $user.id ? 'highlighted' : ''}>
-                    <th>{player.name}</th><th>{Math.round(player.score * 10) / 10}</th>
-                </tr>
-            {/if}
-        {/each}
-    </table>
+    <div>
+        <h1>Leaderboard</h1>
+        <table>
+            <tr><th>Player</th><th>Score</th></tr>
+            {#each leaderboard as player}
+                {#if !player.dead}
+                    <tr class={player.id == $user.id ? 'highlighted' : ''}>
+                        <th>{player.name}</th><th>{Math.round(player.score * 10) / 10}</th>
+                    </tr>
+                {/if}
+            {/each}
+        </table>
+    </div>
 </main>
 
 <style>
     main {
         display: inline-block;
-        width: 25vw;
-        max-height: 100vh;
+        width: 24vw;
+        position: relative;
+        height: 100vh;
+    }
+    div {
+        width: 24vw;
+        height: 50vw;
         padding: 2rem;
-        overflow: scroll;
+        position: absolute;
+        top: 50%; 
+        transform: translateY(-50%);
+        overflow-y: scroll;
     }
     .highlighted {
         background-color: rgba(255, 255, 255, 0.3);
+    }
+    h1 {
+        text-align: center;
     }
 </style>

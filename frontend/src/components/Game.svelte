@@ -12,28 +12,27 @@
 </script>
 
 <main>
-    <div>
-        {#if $gameState}
-            <svg viewBox={`0 0 ${$gameState.map.width} ${$gameState.map.height}`}>
-                    {#each Object.entries($gameState.players) as [id, player]}
-                        {#if !player.dead}
-                            <g transform={`translate(${player.location.x}, ${player.location.y})`}>
-                                {#if id == $user.id}
-                                    <circle r={radius + 1} fill="#ffb2ee"/>
-                                {/if}
-                                <image 
-                                    x={-radius} 
-                                    y={-radius} 
-                                    xlink:href={player.pfp} 
-                                    width={2 * radius}
-                                    height={2 * radius}
-                                />
-                            </g>
-                        {/if}
-                    {/each}
-            </svg>
-        {/if}
-    </div>
+    {#if $gameState}
+        <svg viewBox={`0 0 ${$gameState.map.width} ${$gameState.map.height}`}>
+                {#each Object.entries($gameState.players) as [id, player]}
+                    {#if !player.dead}
+                        <g transform={`translate(${player.location.x}, ${player.location.y})`}>
+                            {#if id == $user.id}
+                                <circle r={radius * 1.2} fill="green"/>
+                            {/if}
+                            <circle r={radius} fill="gray"/>
+                            <image 
+                                x={-radius} 
+                                y={-radius} 
+                                xlink:href={player.pfp} 
+                                width={2 * radius}
+                                height={2 * radius}
+                            />
+                        </g>
+                    {/if}
+                {/each}
+        </svg>
+    {/if}
 </main>
 
 <svelte:window 
@@ -48,16 +47,14 @@
         width: 50vw;
         height: 100vh;
         display: inline-block;
-    }
-    div {
-        display: flex;
-        justify-items: center;
-        width: 100%;
-        height: 100%;
+        position: relative;
     }
     svg {
         width: 50vw;
         height: 50vw;
         background-color: var(--lbg);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
     }
 </style>
