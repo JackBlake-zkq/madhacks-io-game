@@ -3,7 +3,7 @@ let game = {
     playerData: {
         radius: 5,
         startingSpeed: 1,
-        chargeRadius: 20,
+        chargeRadius: 200,
         chargeSpeed: 0.001
     },
     map: {
@@ -127,13 +127,17 @@ let kill = (player) => {
  * perpendicular to the previous direction of motion
  */
 let movePlayerCharge = (player) => {
-    // Move player along circular path by an amount defined by speed
-    // Convert speed to arc length, find point at that arc length
-    let radians = speed / game.playerData.chargeRadius;
+    // Set up variables
+    let vX = player.velocity.x;
+    let vY = player.velocity.y;
     let cX = player.charging.x;
     let cY = player.charging.y;
     let pX = player.location.x;
     let pY = player.location.y;
+    let speed = Math.sqrt(vX*vX + vY*vY);
+    let radians = speed / game.playerData.chargeRadius;
+
+    // Convert speed to arc length, find point at that arc length
     let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
     let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
     
@@ -141,8 +145,6 @@ let movePlayerCharge = (player) => {
     player.location = { x: newX, y: newY };
 
     // Change player velocity by arc angle
-    let vX = player.velocity.x;
-    let vY = player.velocity.y;
     player.velocity = {
         x: Math.cos(radians)*vX - Math.sin(radians)*vY,
         y: Math.sin(radians)*vX + Math.cos(radians)*vY
