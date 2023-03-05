@@ -225,7 +225,7 @@ let addBot = () => {
         charging: null,
         dead: false,
         score: 0,
-        bot: true,
+        isBot: true,
         location: getSpawnLocation(),
         velocity: getSpawnVelocity()
     };
@@ -242,7 +242,8 @@ let addBot = () => {
  * removes the bot.
  */
 let respawnBot = (id) => {
-    if(game.playerData.playerCount + game.map.botCount > minPlayers){
+    if(game.playerData.playerCount + game.map.botCount >= game.playerData.minPlayers){
+        console.log("removing bot");
         removeBot(id);
     } else {
         let bot = game.players[id];
@@ -303,6 +304,7 @@ let addPlayer = (user) => {
 
     // Add new player to player list
     game.players[user.id] = user;
+    game.playerData.playerCount++;
 }
 
 /*
