@@ -30,7 +30,7 @@ let game = {
  */
 let gameLoop = () => {
     // Add bots if player count is less than minimum
-    while (gamep.playerdata.playerCount + game.map.botCount < game.map.minPlayers) {
+    while (game.playerData.playerCount + game.map.botCount < game.map.minPlayers) {
         addBot();
     }
 
@@ -268,7 +268,7 @@ let getSpawnLocation = () => {
         location: position
     };
 
-    for (player of game.players.values()) {
+    for (player of Object.values(game.players)) {
         if (getPlayerDistance(dummyPlayer, player) <= 0) return getSpawnLocation();
     }
 
