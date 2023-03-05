@@ -7,6 +7,8 @@ const http = require('http');
 
 const axios = require('axios');
 
+const { gameLoop, addPlayer, removePlayer, togglePlayerCharging } = require("./gameLogic");
+
 const server = http.createServer(app);
 
 const { Server } = require("socket.io");
@@ -28,34 +30,41 @@ io.on("connection", socket => {
         await axios.get
             ("https://users.roblox.com/v1/users/search?keyword=" + input.username + "&limit=10")
             .then(res => {
-                userData = res.data.data[0];
+                Object.assign(userData, res.data.data[0])
             })
-            if(userData)
+            .catch(() => {});
+
+            if(userData.id)
                 await axios.get
                     ("https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=" + 
                         userData['id'] + "&size=48x48&format=Png&isCircular=true")
                         .then(res => {
                             userData.pfp = res.data.data[0]['imageUrl'];
                         })
+                        .catch(() => {});
             userData.id = currID++;
             user = userData;
-            console.log(user);
             socket.emit("loginSuccessful", user);
     });
     
-    socket.on("join-game", () => {
-
+    socket.on("joinGame", () => {
+        addPlayer(user);
     });
-        socket.on("keydown", () => {
-        
+    socket.on("keydown", () => {
+        togglePlayerCharging(user.id);
     });
     socket.on("keyup", () => {
-        
+        togglePlayerCharging(user.id);
     });
     socket.on('disconnect', () => {
-
+        if(user) removePlayer(user.id);
     });
 });
+
+setInterval(() => {
+    let state = gameLoop();
+    io.emit("gameTick", state);
+}, 10);
     
 
 const port = process.env.PORT || 3000;
