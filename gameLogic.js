@@ -2,14 +2,14 @@
 let game = {
     playerData: {
         radius: 5,
-        startingSpeed: 0.5,
+        startingSpeed: 1,
         chargeRadius: 20,
         chargeSpeed: 0.001
     },
     map: {
-        width: 20000,
-        height: 20000,
-        spawnMargin: game.playerData.radius // The closest players can spawn to the edge of the map
+        width: 1000,
+        height: 1000,
+        spawnMargin: 20 // The closest players can spawn to the edge of the map
     },
     players: {}
 };
@@ -24,9 +24,10 @@ let game = {
  */
 let gameLoop = () => {
     // Loop through each player
-    let players = Object.entries(game.players);
+    let players = Object.values(game.players);
     for (let i = 0; i < players.length; i++) {
         let player = players[i];
+        if (player.dead) continue;
 
         // Move player
         if (player.charging) {
@@ -62,7 +63,7 @@ let handleObstacleCollision = (player) => {
 */
 let handlePlayerCollision = (player, index) => {
     // Get list of players
-    let players = Object.entries(game.players);
+    let players = Object.values(game.players);
 
     // Filter list of players to those colliding with the player
     let colliding = [];
@@ -78,7 +79,7 @@ let handlePlayerCollision = (player, index) => {
         let dist = Math.sqrt(distX*distX + distY*distY);
 
         // If distance between the edges of the players <0, they're colliding
-        if (dist - (game.playerData.radius * 2)) colliding.push(otherPlayer);
+        if (dist - (game.playerData.radius * 2) <= 0) colliding.push(otherPlayer);
     }
 
     // Handle conflict and kill losing player
@@ -131,13 +132,13 @@ let movePlayerCharge = (player) => {
     let radians = speed / game.playerData.chargeRadius;
     let cX = player.charging.x;
     let cY = player.charging.y;
-    let pX = player.position.x;
-    let pY = player.position.y;
+    let pX = player.location.x;
+    let pY = player.location.y;
     let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
     let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
     
-    // Set player position to new position
-    player.position = { x: newX, y: newY };
+    // Set player location to new location
+    player.location = { x: newX, y: newY };
 
     // Change player velocity by arc angle
     let vX = player.velocity.x;
@@ -180,9 +181,9 @@ let addPlayer = (user) => {
     user.charging = null; // Will contain center point of charging circle if currently charging
     user.dead = false;
 
-    // Set new player position
+    // Set new player location
     let spawnPadding = game.playerData.radius + game.map.spawnMargin;
-    user.position = {
+    user.location = {
         x: (Math.random() * (game.map.width - 2*spawnPadding)) + spawnPadding,
         y: (Math.random() * (game.map.height - 2*spawnPadding)) + spawnPadding
     };
@@ -210,8 +211,7 @@ let removePlayer = (playerId) => {
  * Sets a player's charging value to the center point that
  * it will be spinning around while charging.
  */
-let startPlayerCharging = (playerId) => {
-    let player = game.players[playerId];
+let startPlayerCharging = (player) => {
     let speed = Math.sqrt(Math.pow(player.velocity.x, 2) + Math.pow(player.velocity.y, 2));
     player.charging = {
         x: player.velocity.y / speed * game.playerData.chargeRadius,
@@ -222,6 +222,14 @@ let startPlayerCharging = (playerId) => {
 /*
  * Stops player from charging by setting its charging value to null.
  */
-let stopPlayerCharging = (playerId) => {
-    game.players[playerId].charging = null;
+let stopPlayerCharging = (player) => {
+    player.charging = null;
 }
+
+let togglePlayerCharging = (playerId) => {
+    let player = game.players[playerId];
+    if (player.charging) stopPlayerCharging(player);
+    else startPlayerCharging(player);
+}
+
+module.exports = { gameLoop, addPlayer, removePlayer, togglePlayerCharging };
