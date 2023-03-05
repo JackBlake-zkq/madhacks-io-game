@@ -177,7 +177,7 @@ let increaseSpeed = (player, increase) => {
 
     // Multiply increase based on current speed
     let capDiff = game.playerData.speedCap - speed;
-    let multiplier = capDiff / speedCap;
+    let multiplier = capDiff / game.playerData.speedCap;
 
     // Calculate new speed
     let newSpeed = speed + (increase*multiplier);
