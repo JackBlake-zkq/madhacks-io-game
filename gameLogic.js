@@ -35,7 +35,7 @@ let gameLoop = () => {
             // Increase player speed
             //increaseSpeed(player); // TODO
         }
-        else movePlayerStraight(player);
+        movePlayerStraight(player);
 
         // Check if player is colliding with anything
         handleObstacleCollision(player);
@@ -52,7 +52,7 @@ let gameLoop = () => {
 let handleObstacleCollision = (player) => {
     // Top wall
     if (player.location.y - game.playerData.radius <= 0) {
-        player.velocty.y *= -1;
+        player.velocity.y *= -1;
         player.location.y = game.playerData.radius + 1;
     }
 
@@ -155,12 +155,14 @@ let movePlayerCharge = (player) => {
     let speed = Math.sqrt(vX*vX + vY*vY);
     let radians = speed / game.playerData.chargeRadius;
 
+    /*
     // Convert speed to arc length, find point at that arc length
     let newX = cX + ((pX - cX)*Math.cos(radians)) + ((cY - pY)*Math.sin(radians));
     let newY = cY + ((pY - cY)*Math.cos(radians)) + ((pX - cX)*Math.sin(radians));
     
     // Set player location to new location
     player.location = { x: newX, y: newY };
+    */
 
     // Change player velocity by arc angle
     player.velocity = {
